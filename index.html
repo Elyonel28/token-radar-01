@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar — pre-token protocol board</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="mark" aria-hidden="true">◉</div>
+    <div>
+      <h1>Token Radar</h1>
+      <p class="sub">Which pre-token protocols are worth farming — and what their launch would be worth.</p>
+    </div>
+  </div>
+  <div class="meta" id="meta"></div>
+</header>
+
+<nav class="tabs" aria-label="Views">
+  <button class="tab active" data-tab="board" type="button">Board</button>
+  <button class="tab" data-tab="live" type="button">Live tokens &amp; comps</button>
+  <button class="tab" data-tab="model" type="button">How it works</button>
+</nav>
+
+<main>
+  <section id="tab-board" class="panel">
+    <div class="controls" role="search">
+      <label class="ctl">Search
+        <input id="q" type="search" placeholder="Protocol name or slug…" autocomplete="off">
+      </label>
+      <label class="ctl">Category
+        <select id="fcat"><option value="">All categories</option></select>
+      </label>
+      <label class="ctl">Chain
+        <select id="fchain"><option value="">All chains</option></select>
+      </label>
+      <label class="ctl">Scope
+        <select id="fscope">
+          <option value="all">All 198 ranked</option>
+          <option value="watchlist">Watchlist only</option>
+          <option value="early">Early (below the floor)</option>
+        </select>
+      </label>
+      <label class="ctl">Sort by
+        <select id="fsort">
+          <option value="value">Implied value</option>
+          <option value="tvl">TVL</option>
+          <option value="growth">7-day change</option>
+          <option value="age">Age (oldest)</option>
+        </select>
+      </label>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+
+    <article id="detail" class="detail" hidden></article>
+
+    <div class="tablewrap">
+      <table id="board">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Protocol</th>
+            <th class="num">TVL</th>
+            <th class="num">7d</th>
+            <th class="num">Age</th>
+            <th class="num">Multiple</th>
+            <th class="num">Implied value</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button id="prev" type="button">← Previous</button>
+      <span id="pageinfo"></span>
+      <button id="next" type="button">Next →</button>
+    </div>
+    <p class="note">Implied value is this radar's own claim, from the snapshot's own figures — not a prediction that a token is issued, or when. A protocol that records no token may still have one its DefiLlama record does not carry.</p>
+  </section>
+
+  <section id="tab-live" class="panel" hidden>
+    <h2>Live tokens: the comparables</h2>
+    <p class="lede">Every pre-token value on the board is priced off these live tokens. The multiple is the market's own FDV/TVL for the protocol's category. Below, the 24 largest live-token protocols by market cap, then the multiples table the model uses.</p>
+    <div class="tablewrap">
+      <table id="livetab">
+        <thead>
+          <tr><th>Protocol</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">FDV / TVL</th></tr>
+        </thead>
+        <tbody id="liverows"></tbody>
+      </table>
+    </div>
+    <h2>Category multiples</h2>
+    <p class="lede">Median FDV/TVL of the live protocols in each category. A category needs at least 3 comparables; anything fewer uses the global median, so one outlier never sets a price.</p>
+    <div class="tablewrap">
+      <table id="comptab">
+        <thead>
+          <tr><th>Category</th><th class="num">Comparables</th><th class="num">Median multiple</th></tr>
+        </thead>
+        <tbody id="comprows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tab-model" class="panel" hidden>
+    <h2>How the radar prices a launch</h2>
+    <div class="formula">
+      <p><strong>implied&nbsp;=&nbsp;TVL&nbsp;×&nbsp;multiple&nbsp;×&nbsp;growth&nbsp;×&nbsp;maturity</strong></p>
+      <ul>
+        <li><strong>multiple</strong> — the median FDV/TVL of the live-token protocols in the protocol's category (at least 3 comparables; otherwise the global median). Capped at 1.5. The market's own pricing, not a hardcoded list of names.</li>
+        <li><strong>growth</strong> — 1 + clamp(7-day TVL change, −50%, +100%) × 0.35. A hot week lifts value; it never doubles it.</li>
+        <li><strong>maturity</strong> — 0.70 + 0.30 × ln(1 + age in days) / ln(1 + 1095). Older protocols are worth more, with diminishing returns. Unknown age counts as 365 days.</li>
+      </ul>
+    </div>
+    <h2>What the board covers</h2>
+    <p class="lede">The snapshot holds 758 protocols at or above $5M TVL. The board ranks all 198 that record no token and are not a wrapped, staked or bridged product, an exchange or a versioned pool: the 40 on the house watchlist (TVL at or above $50M, no token, not a wrapped, staked or bridged product) plus 158 more below the floor. The watchlist is a floor, never a ceiling. Live-token protocols are kept apart and shown at the market's own value.</p>
+    <h2>How to farm</h2>
+    <p class="lede">Open any protocol for a six-step plan: a fresh wallet, the main position, a second qualifying action, one action a week, a hold of 30–60 days, and a claim only from the protocol's own page. Each step states what it costs and how long it takes. Never pay to claim, and never trust a link that is not the protocol's own.</p>
+    <h2>Data</h2>
+    <p class="lede" id="datasrc"></p>
+  </section>
+</main>
+
+<footer>
+  <p>Token Radar · model <span id="mver"></span> · a static page: no network, no tracking, no wallet needed.</p>
+</footer>
+
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
